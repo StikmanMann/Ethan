@@ -1,0 +1,11 @@
+import { ItemStack } from "@minecraft/server";
+export const pickaxeLevels = [];
+const levelOne = new ItemStack("minecraft:wooden_pickaxe");
+levelOne.nameTag = "§rLevel 1 Pickaxe";
+pickaxeLevels.push(levelOne);
+const levelTwo = new ItemStack("minecraft:iron_pickaxe");
+levelTwo.nameTag = "§rLevel 2 Pickaxe";
+pickaxeLevels.push(levelTwo);
+const levelThree = new ItemStack("minecraft:diamond_pickaxe");
+levelThree.nameTag = "§rLevel 3 Pickaxe";
+pickaxeLevels.push(levelThree);
