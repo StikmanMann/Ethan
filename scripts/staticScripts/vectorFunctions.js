@@ -1,3 +1,4 @@
+import { EDirection } from "Ethan/MapGenerations/Room/Rooms";
 export { VectorFunctions };
 class VectorFunctions {
     /**
@@ -204,6 +205,64 @@ class VectorFunctions {
         return { x: x, y: y, z: z };
     }
 }
+/**
+ * Get the rotation angles (in radians) to rotate one vector to another.
+ * @param {Vector3} fromVector - The starting vector.
+ * @param {Vector3} toVector - The target vector.
+ * @returns {{import("@minecraft/server").Vector3}} - The rotation angles.
+ */
+/*  static getVectorRotation(fromVector, toVector){
+  const epsilon = 0.000001; // A small value to handle floating-point errors
+
+  // Ensure vectors are normalized
+  this.normalizeVector()
+  const normalize = (v: Vector3) => {
+    const length = Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+    return { x: v.x / length, y: v.y / length, z: v.z / length };
+  };
+
+  const fromNormalized = normalize(fromVector);
+  const toNormalized = normalize(toVector);
+
+  // Calculate dot product and cross product
+  const dotProduct = fromNormalized.x * toNormalized.x + fromNormalized.y * toNormalized.y + fromNormalized.z * toNormalized.z;
+  const crossProduct = {
+    x: fromNormalized.y * toNormalized.z - fromNormalized.z * toNormalized.y,
+    y: fromNormalized.z * toNormalized.x - fromNormalized.x * toNormalized.z,
+    z: fromNormalized.x * toNormalized.y - fromNormalized.y * toNormalized.x,
+  };
+
+  // Calculate angles
+  const angleX = Math.asin(crossProduct.y);
+  const angleY = Math.atan2(-crossProduct.x, crossProduct.z);
+  const angleZ = Math.atan2(-fromNormalized.y, fromNormalized.x);
+
+  // Ensure angles are within the correct range
+  const clampAngle = (angle) => {
+    while (angle > Math.PI) angle -= 2 * Math.PI;
+    while (angle < -Math.PI) angle += 2 * Math.PI;
+    return angle;
+  };
+
+  return {
+      x: clampAngle(angleX),
+      y: clampAngle(angleY),
+      z: clampAngle(angleZ)
+  }; */
+VectorFunctions.getVectorFromDirection = (direction) => {
+    switch (direction) {
+        case EDirection.east:
+            return { x: 0, y: 0, z: 1 };
+        case EDirection.west:
+            return { x: 0, y: 0, z: -1 };
+        case EDirection.north:
+            return { x: 1, y: 0, z: 0 };
+        case EDirection.south:
+            return { x: -1, y: 0, z: 0 };
+        default:
+            throw new Error("Invalid direction");
+    }
+};
 String.prototype.toVector3 = function () {
     return VectorFunctions.stringToVector(this);
 };

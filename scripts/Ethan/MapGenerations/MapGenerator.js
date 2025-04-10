@@ -1,5 +1,5 @@
 import { StructureSaveMode, world, } from "@minecraft/server";
-import { rooms } from "./Room/Rooms";
+import { EDirection, rooms } from "./Room/Rooms";
 import { VectorFunctions } from "staticScripts/vectorFunctions";
 let dimension = world.getDimension("overworld");
 let structures;
@@ -10,8 +10,8 @@ let openConnectors = [];
 ); */
 const generateRooms = (startingPosition) => {
     //First room
-    let room = rooms[0];
-    world.structureManager.place(structures[0], dimension, startingPosition);
+    let room = rooms[Math.floor(Math.random() * rooms.length)];
+    world.structureManager.place(structures[room.index], dimension, startingPosition);
     for (const connector of room.roomConnectors) {
         openConnectors.push({
             direction: connector.direction,
@@ -23,6 +23,60 @@ const generateRooms = (startingPosition) => {
 const generateConnectors = () => {
     for (const connector of openConnectors) {
         dimension.setBlockType(connector.location, "minecraft:glowstone");
+        while (true) {
+            const viabelRooms = rooms.filter((room) => {
+                const randomConnector = room.roomConnectors.find((c) => {
+                    if (c.direction == EDirection.east &&
+                        connector.direction == EDirection.west) {
+                        return true;
+                    }
+                    if (c.direction == EDirection.west &&
+                        connector.direction == EDirection.east) {
+                        return true;
+                    }
+                    if (c.direction == EDirection.north &&
+                        connector.direction == EDirection.south) {
+                        return true;
+                    }
+                    if (c.direction == EDirection.south &&
+                        connector.direction == EDirection.north) {
+                        return true;
+                    }
+                    return false;
+                });
+                if (randomConnector) {
+                    world.sendMessage(`
+          I DID NOT FIND A CONNECTOR FOR: ${room.id} and direction: ${connector.direction}}`);
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+            const randomRoom = viabelRooms[Math.floor(Math.random() * viabelRooms.length)];
+            const viableConnectors = randomRoom.roomConnectors.filter((c) => {
+                if (c.direction == EDirection.east &&
+                    connector.direction == EDirection.west) {
+                    return true;
+                }
+                if (c.direction == EDirection.west &&
+                    connector.direction == EDirection.east) {
+                    return true;
+                }
+                if (c.direction == EDirection.north &&
+                    connector.direction == EDirection.south) {
+                    return true;
+                }
+                if (c.direction == EDirection.south &&
+                    connector.direction == EDirection.north) {
+                    return true;
+                }
+                return false;
+            });
+            const randomConnector = viableConnectors[Math.floor(Math.random() * viableConnectors.length)];
+            world.structureManager.place(structures[randomRoom.index], dimension, VectorFunctions.addVector(VectorFunctions.addVector(connector.location, VectorFunctions.subtractVector(VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition), randomConnector.location)), VectorFunctions.getVectorFromDirection(connector.direction)));
+            break;
+        }
     }
 };
 const generateStructures = () => {

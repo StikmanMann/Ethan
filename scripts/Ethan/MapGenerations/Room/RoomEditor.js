@@ -178,4 +178,4 @@ addCommand({
         setPlayerToEdit(player);
     },
 });
-setPlayerToEdit(world.getAllPlayers()[0]);
+//setPlayerToEdit(world.getAllPlayers()[0]);

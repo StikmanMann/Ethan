@@ -1,4 +1,5 @@
 import { world, Vector3 } from "@minecraft/server";
+import { EDirection } from "Ethan/MapGenerations/Room/Rooms";
 
 export { VectorFunctions };
 
@@ -288,6 +289,21 @@ class VectorFunctions {
         y: clampAngle(angleY),
         z: clampAngle(angleZ)
     }; */
+
+  static getVectorFromDirection = (direction: EDirection): Vector3 => {
+    switch (direction) {
+      case EDirection.east:
+        return { x: 0, y: 0, z: 1 };
+      case EDirection.west:
+        return { x: 0, y: 0, z: -1 };
+      case EDirection.north:
+        return { x: 1, y: 0, z: 0 };
+      case EDirection.south:
+        return { x: -1, y: 0, z: 0 };
+      default:
+        throw new Error("Invalid direction");
+    }
+  };
 }
 
 declare global {
