@@ -11,7 +11,7 @@
     "whatwg-fetch": "^3.6.20"
   },
   "devDependencies": {
-    "@minecraft/server": "^1.16.0-beta.1.21.44-stable",
+    "@minecraft/server": "^1.18.0",
     "@types/node": "^20.11.16",
     "gulp": "^5.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",

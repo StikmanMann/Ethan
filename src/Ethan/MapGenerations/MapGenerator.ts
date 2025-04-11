@@ -7,7 +7,7 @@ import {
 import { EDirection, rooms } from "./Room/Rooms";
 import { VectorFunctions } from "staticScripts/vectorFunctions";
 let dimension = world.getDimension("overworld");
-let structures;
+let structures: Map<number, Structure> = new Map();
 let openConnectors: { location: Vector3; direction: EDirection }[] = [];
 
 /* bedwarsData.lapisGenerators[i] = VectorFunctions.subtractVector(
@@ -18,7 +18,7 @@ const generateRooms = (startingPosition: Vector3) => {
   //First room
   let room = rooms[Math.floor(Math.random() * rooms.length)];
   world.structureManager.place(
-    structures[room.index],
+    structures.get(room.index),
     dimension,
 
     startingPosition
@@ -117,7 +117,7 @@ const generateConnectors = () => {
         viableConnectors[Math.floor(Math.random() * viableConnectors.length)];
 
       world.structureManager.place(
-        structures[randomRoom.index],
+        structures.get(randomRoom.index),
         dimension,
         VectorFunctions.addVector(
           VectorFunctions.addVector(
@@ -140,8 +140,7 @@ const generateConnectors = () => {
   }
 };
 
-const generateStructures = (): Structure[] => {
-  let structures: Structure[] = [];
+const generateStructures = () => {
 
   for (const room of rooms) {
     world.structureManager.delete(`ethan:${room.id}`);
@@ -152,10 +151,9 @@ const generateStructures = (): Structure[] => {
       room.endPosition,
       { saveMode: StructureSaveMode.Memory }
     );
-    structures.push(struct);
+    structures.set(room.index,struct);
   }
-  return structures;
 };
 
-structures = generateStructures();
-generateRooms({ x: 0, y: -46, z: 0 });
+generateStructures();
+generateRooms({ x: 0, y: -46, z: 50 });

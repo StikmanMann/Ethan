@@ -2,7 +2,7 @@ import { StructureSaveMode, world, } from "@minecraft/server";
 import { EDirection, rooms } from "./Room/Rooms";
 import { VectorFunctions } from "staticScripts/vectorFunctions";
 let dimension = world.getDimension("overworld");
-let structures;
+let structures = new Map();
 let openConnectors = [];
 /* bedwarsData.lapisGenerators[i] = VectorFunctions.subtractVector(
   VectorFunctions.addVector(bedwarsData.lapisGenerators[i], offset),
@@ -11,7 +11,7 @@ let openConnectors = [];
 const generateRooms = (startingPosition) => {
     //First room
     let room = rooms[Math.floor(Math.random() * rooms.length)];
-    world.structureManager.place(structures[room.index], dimension, startingPosition);
+    world.structureManager.place(structures.get(room.index), dimension, startingPosition);
     for (const connector of room.roomConnectors) {
         openConnectors.push({
             direction: connector.direction,
@@ -25,26 +25,30 @@ const generateConnectors = () => {
         dimension.setBlockType(connector.location, "minecraft:glowstone");
         while (true) {
             const viabelRooms = rooms.filter((room) => {
-                const randomConnector = room.roomConnectors.find((c) => {
+                let hasViableConnector = false;
+                for (const c of room.roomConnectors) {
                     if (c.direction == EDirection.east &&
                         connector.direction == EDirection.west) {
-                        return true;
+                        hasViableConnector = true;
+                        break;
                     }
                     if (c.direction == EDirection.west &&
                         connector.direction == EDirection.east) {
-                        return true;
+                        hasViableConnector = true;
+                        break;
                     }
                     if (c.direction == EDirection.north &&
                         connector.direction == EDirection.south) {
-                        return true;
+                        hasViableConnector = true;
+                        break;
                     }
                     if (c.direction == EDirection.south &&
                         connector.direction == EDirection.north) {
-                        return true;
+                        hasViableConnector = true;
+                        break;
                     }
-                    return false;
-                });
-                if (randomConnector) {
+                }
+                if (!hasViableConnector) {
                     world.sendMessage(`
           I DID NOT FIND A CONNECTOR FOR: ${room.id} and direction: ${connector.direction}}`);
                     return false;
@@ -74,19 +78,17 @@ const generateConnectors = () => {
                 return false;
             });
             const randomConnector = viableConnectors[Math.floor(Math.random() * viableConnectors.length)];
-            world.structureManager.place(structures[randomRoom.index], dimension, VectorFunctions.addVector(VectorFunctions.addVector(connector.location, VectorFunctions.subtractVector(VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition), randomConnector.location)), VectorFunctions.getVectorFromDirection(connector.direction)));
+            world.structureManager.place(structures.get(randomRoom.index), dimension, VectorFunctions.addVector(VectorFunctions.addVector(connector.location, VectorFunctions.subtractVector(VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition), randomConnector.location)), VectorFunctions.getVectorFromDirection(connector.direction)));
             break;
         }
     }
 };
 const generateStructures = () => {
-    let structures = [];
     for (const room of rooms) {
         world.structureManager.delete(`ethan:${room.id}`);
         const struct = world.structureManager.createFromWorld(`ethan:${room.id}`, dimension, room.startPosition, room.endPosition, { saveMode: StructureSaveMode.Memory });
-        structures.push(struct);
+        structures.set(room.index, struct);
     }
-    return structures;
 };
-structures = generateStructures();
-generateRooms({ x: 0, y: -46, z: 0 });
+generateStructures();
+generateRooms({ x: 0, y: -46, z: 50 });
