@@ -8,6 +8,30 @@ let openConnectors = [];
   VectorFunctions.addVector(bedwarsData.lapisGenerators[i], offset),
   mapData.startLocation
 ); */
+function deepCopy(obj) {
+    // Check if the value is an object or function, otherwise return it directly
+    if (obj === null || typeof obj !== "object") {
+        return obj;
+    }
+    // Handle Date
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    // Handle Array
+    if (Array.isArray(obj)) {
+        const arrCopy = [];
+        obj.forEach((_, i) => {
+            arrCopy[i] = deepCopy(obj[i]);
+        });
+        return arrCopy;
+    }
+    // Handle Object
+    const objCopy = {};
+    Object.keys(obj).forEach((key) => {
+        objCopy[key] = deepCopy(obj[key]);
+    });
+    return objCopy;
+}
 const generateRooms = (startingPosition) => {
     //First room
     let room = rooms[Math.floor(Math.random() * rooms.length)];
@@ -18,10 +42,12 @@ const generateRooms = (startingPosition) => {
             location: VectorFunctions.subtractVector(VectorFunctions.addVector(connector.location, startingPosition), VectorFunctions.smallestOnly(room.startPosition, room.endPosition)),
         });
     }
-    generateConnectors();
+    generateConnectors(0);
 };
-const generateConnectors = () => {
-    for (const connector of openConnectors) {
+const generateConnectors = (depth) => {
+    let temporaryConnectors = [];
+    let copiedConnectors = deepCopy(openConnectors);
+    for (const connector of copiedConnectors) {
         dimension.setBlockType(connector.location, "minecraft:glowstone");
         while (true) {
             const viabelRooms = rooms.filter((room) => {
@@ -79,9 +105,27 @@ const generateConnectors = () => {
             });
             const randomConnector = viableConnectors[Math.floor(Math.random() * viableConnectors.length)];
             world.structureManager.place(structures.get(randomRoom.index), dimension, VectorFunctions.addVector(VectorFunctions.addVector(connector.location, VectorFunctions.subtractVector(VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition), randomConnector.location)), VectorFunctions.getVectorFromDirection(connector.direction)));
+            for (const randomRoomConnector of randomRoom.roomConnectors) {
+                if (VectorFunctions.vectorToString(randomRoomConnector.location) == VectorFunctions.vectorToString(randomConnector.location)) {
+                    continue;
+                }
+                temporaryConnectors.push({
+                    direction: connector.direction,
+                    location: VectorFunctions.addVector(VectorFunctions.addVector(VectorFunctions.addVector(connector.location, VectorFunctions.subtractVector(VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition), randomConnector.location)), VectorFunctions.getVectorFromDirection(connector.direction)), VectorFunctions.subtractVector(randomConnector.location, VectorFunctions.smallestOnly(randomRoom.startPosition, randomRoom.endPosition)))
+                });
+            }
+            openConnectors = [];
             break;
         }
     }
+    openConnectors = openConnectors.concat(temporaryConnectors);
+    for (const connector of openConnectors) {
+        dimension.setBlockType(connector.location, "minecraft:sea_lantern");
+    }
+    if (depth <= 0) {
+        return;
+    }
+    generateConnectors(depth - 1);
 };
 const generateStructures = () => {
     for (const room of rooms) {
@@ -91,4 +135,4 @@ const generateStructures = () => {
     }
 };
 generateStructures();
-generateRooms({ x: 0, y: -46, z: 50 });
+generateRooms({ x: 50, y: -40, z: -50 });
