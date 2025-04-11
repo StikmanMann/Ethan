@@ -41,35 +41,39 @@ const generateConnectors = () => {
     dimension.setBlockType(connector.location, "minecraft:glowstone");
     while (true) {
       const viabelRooms = rooms.filter((room) => {
-        const randomConnector = room.roomConnectors.find((c) => {
+        let hasViableConnector = false;
+        for (const c of room.roomConnectors) {
           if (
             c.direction == EDirection.east &&
             connector.direction == EDirection.west
           ) {
-            return true;
+            hasViableConnector = true;
+            break;
           }
           if (
             c.direction == EDirection.west &&
             connector.direction == EDirection.east
           ) {
-            return true;
+            hasViableConnector = true;
+            break;
           }
           if (
             c.direction == EDirection.north &&
             connector.direction == EDirection.south
           ) {
-            return true;
+            hasViableConnector = true;
+            break;
           }
           if (
             c.direction == EDirection.south &&
             connector.direction == EDirection.north
           ) {
-            return true;
+            hasViableConnector = true;
+            break;
           }
-          return false;
-        });
+        }
 
-        if (randomConnector) {
+        if (!hasViableConnector) {
           world.sendMessage(`
           I DID NOT FIND A CONNECTOR FOR: ${room.id} and direction: ${connector.direction}}`);
           return false;
