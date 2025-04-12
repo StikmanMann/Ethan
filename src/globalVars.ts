@@ -5,44 +5,72 @@ import {
   Vector3,
   Entity,
   EntityQueryOptions,
+  system,
 } from "@minecraft/server";
+
 export { GlobalVars };
+
 class GlobalVars {
-  static players = world.getAllPlayers();
+  /**
+   * @type {Player[]}
+   */
+  static players: Player[] = [];
 
   /**
    * @type {Dimension}
    */
-  static overworld = world.getDimension("overworld");
+  static overworld: Dimension;
 
-  static nether = world.getDimension("nether");
+  static nether: Dimension;
 
-  static theEnd = world.getDimension("the_end");
+  static theEnd: Dimension;
+
+  static spawn: Vector3 = { x: 15, y: 300, z: 15 };
+
+  static structureManager;
+
+  static initialize() {
+    system.run(() => {
+      this.players = world.getAllPlayers();
+      this.overworld = world.getDimension("overworld");
+      this.nether = world.getDimension("nether");
+      this.theEnd = world.getDimension("the_end");
+      this.structureManager = world.structureManager;
+    });
+  }
 
   static getAllEntities(options?: EntityQueryOptions): Entity[] {
-    const entities = options
-      ? GlobalVars.overworld
-          .getEntities(options)
-          .concat(GlobalVars.nether.getEntities(options))
-          .concat(GlobalVars.theEnd.getEntities(options))
-      : GlobalVars.overworld
-          .getEntities()
-          .concat(GlobalVars.nether.getEntities())
-          .concat(GlobalVars.theEnd.getEntities());
+    let entities: Entity[] = [];
+    system.run(() => {
+      entities = options
+        ? this.overworld
+            .getEntities(options)
+            .concat(this.nether.getEntities(options))
+            .concat(this.theEnd.getEntities(options))
+        : this.overworld
+            .getEntities()
+            .concat(this.nether.getEntities())
+            .concat(this.theEnd.getEntities());
+    });
     return entities;
   }
 
-  static getPlayers() {
-    this.players = world.getAllPlayers();
+  static updatePlayers() {
+    system.run(() => {
+      this.players = world.getAllPlayers();
+    });
   }
-
-  static spawn = { x: 15, y: 300, z: 15 } as Vector3;
 }
 
-world.afterEvents.playerSpawn.subscribe((eventData) => {
-  GlobalVars.getPlayers();
+// Initialize on first tick
+system.run(() => {
+  GlobalVars.initialize();
 });
 
-world.afterEvents.playerLeave.subscribe((eventData) => {
-  GlobalVars.getPlayers();
+world.afterEvents.playerSpawn.subscribe(() => {
+  GlobalVars.updatePlayers();
+});
+
+world.afterEvents.playerLeave.subscribe(() => {
+  GlobalVars.updatePlayers();
 });

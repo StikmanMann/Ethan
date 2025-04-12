@@ -1,4 +1,4 @@
-import { Player, Vector3, world } from "@minecraft/server";
+import { Player, system, Vector3, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { getColoredWool } from "Bedwars/ChestShop/ColoredBlocks";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";
@@ -37,14 +37,19 @@ export const pushRoomToWorld = (room: IRoom) => {
     }
   }
 
-  world.setDynamicProperty(room.index.toString(), JSON.stringify(room));
-  world.sendMessage("Pushed room to world!");
+  system.run(() => {
+    world.setDynamicProperty(room.index.toString(), JSON.stringify(room));
+    world.sendMessage("Pushed room to world!");
+  });
+
   rooms = getAllRooms();
 };
 
 const removeRoomFromWorld = (room: IRoom) => {
-  world.setDynamicProperty(room.index.toString());
-  world.sendMessage("Removed room from world!");
+  system.run(() => {
+    world.setDynamicProperty(room.index.toString());
+    world.sendMessage("Removed room from world!");
+  });
   rooms = getAllRooms();
 };
 
@@ -84,26 +89,29 @@ const printAllRooms = () => {
 };
 
 const getAllRooms = (): IRoom[] => {
-  const allDynamicProperties = world.getDynamicPropertyIds();
-  const rooms: IRoom[] = [];
-  for (const dynamicProperty of allDynamicProperties) {
-    if (isNaN(parseInt(dynamicProperty))) {
+  let rooms: IRoom[] = [];
+  system.run(() => {
+    const allDynamicProperties = world.getDynamicPropertyIds();
+
+    for (const dynamicProperty of allDynamicProperties) {
+      if (isNaN(parseInt(dynamicProperty))) {
+        continue;
+      }
+      const value = world.getDynamicProperty(dynamicProperty);
+      if (typeof value != "string") {
+        Logger.warn(
+          "Dynamic property with number id is not a string",
+          "Get All Rooms"
+        );
+        continue;
+      }
+      const data = JSON.parse(value);
+      // if (data instanceof IRoom) {
+      rooms.push(JSON.parse(value));
+      // }
       continue;
     }
-    const value = world.getDynamicProperty(dynamicProperty);
-    if (typeof value != "string") {
-      Logger.warn(
-        "Dynamic property with number id is not a string",
-        "Get All Rooms"
-      );
-      continue;
-    }
-    const data = JSON.parse(value);
-    // if (data instanceof IRoom) {
-    rooms.push(JSON.parse(value));
-    // }
-    continue;
-  }
+  });
   return rooms;
 };
 

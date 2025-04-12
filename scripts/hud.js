@@ -1,9 +1,9 @@
-import { world } from '@minecraft/server';
-import { GlobalVars } from './globalVars';
-import { TickFunctions } from './staticScripts/tickFunctions';
-import { LinkedList } from 'dataTypes/linkedList';
-import { ActionFormData, ModalFormData } from '@minecraft/server-ui';
-import { showHUD } from 'staticScripts/commandFunctions';
+import { world, } from "@minecraft/server";
+import { GlobalVars } from "./globalVars";
+import { TickFunctions } from "./staticScripts/tickFunctions";
+import { LinkedList } from "dataTypes/linkedList";
+import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { showHUD } from "staticScripts/commandFunctions";
 let actionbarMessages = new LinkedList();
 TickFunctions.addFunction(() => tick(), 1);
 let centerFiller = 0;
@@ -37,9 +37,13 @@ const tick = () => {
 export const addActionbarMessage = (actionbarMessage) => {
     actionbarMessages.append(actionbarMessage);
 };
-for (const player of world.getAllPlayers()) {
+for (const player of GlobalVars.players) {
     world.sendMessage(`§a§lHud initalised!`);
-    addActionbarMessage({ player: player, message: `§a§lHud initalised!`, lifetime: 100 });
+    addActionbarMessage({
+        player: player,
+        message: `§a§lHud initalised!`,
+        lifetime: 100,
+    });
 }
 export const askForConfirmation = (player, askMessage) => {
     const form = new ActionFormData();
@@ -59,12 +63,12 @@ export const askForConfirmation = (player, askMessage) => {
         }
     });
 };
-export const choosePlayer = async (showHUDPlayer, ignoreSelf = false, playersToChooseFrom = world.getPlayers()) => {
+export const choosePlayer = async (showHUDPlayer, ignoreSelf = false, playersToChooseFrom = GlobalVars.players) => {
     const choosePlayerPanel = new ActionFormData();
     choosePlayerPanel.title("Choose Player");
     choosePlayerPanel.button("Search by name");
     const playerNameArray = playersToChooseFrom.map((player) => player.name);
-    for (const player of world.getPlayers()) {
+    for (const player of GlobalVars.players) {
         choosePlayerPanel.button(`${player.name} (aka ${player.nameTag})`);
     }
     return showHUD(showHUDPlayer, choosePlayerPanel).then((response) => {
@@ -79,7 +83,9 @@ export const choosePlayer = async (showHUDPlayer, ignoreSelf = false, playersToC
                 if (res.canceled) {
                     return;
                 }
-                const filteredPlayers = world.getPlayers().filter((player) => player.name === res.formValues[0]);
+                const filteredPlayers = world
+                    .getPlayers()
+                    .filter((player) => player.name === res.formValues[0]);
                 if (filteredPlayers.length === 0) {
                     showHUDPlayer.sendMessage(`§cNo player found with the name ${res.formValues[0]}\nMake sure to use the name, not the nameTag/nick`);
                     return;

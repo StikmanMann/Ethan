@@ -31,7 +31,7 @@ import "./MapParser/loadMap"
 //Player Functions
 import "Ethan/EthanMain";
 //Better Chat
-import "betterChat";
+//import "betterChat";
 import { Logger } from "staticScripts/Logger";
 Logger.warn("Ethan script running!", "Ethan");
 //import "Ollama/mainOllama";

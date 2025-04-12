@@ -13,7 +13,11 @@ import { CollisionFunctions } from "./collisionFunctions";
 import { Logger } from "./Logger";
 //import { sys } from "typescript";
 //import { sys } from "typescript"
-const overworld = world.getDimension("overworld");
+let overworld;
+system.run(() => {
+  overworld = world.getDimension("overworld");
+});
+
 export { DrawFunctions };
 
 type ParticleList = {

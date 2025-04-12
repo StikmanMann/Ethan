@@ -6,17 +6,24 @@ import { TickFunctions } from "staticScripts/tickFunctions";
 import { DrawFunctions } from "staticScripts/drawFunctions";
 import { ModalFormData } from "@minecraft/server-ui";
 
-const roomConnectorSword = new ItemStack("minecraft:diamond_sword", 1);
-roomConnectorSword.nameTag = "RoomConnectorSword";
+let roomConnectorSword: ItemStack;
+let startPositionPickaxe: ItemStack;
+let endPositionAxe: ItemStack;
+let saveRoomHoe: ItemStack;
 
-const startPositionPickaxe = new ItemStack("minecraft:diamond_pickaxe", 1);
-startPositionPickaxe.nameTag = "StartPositionPickaxe";
+system.run(() => {
+  roomConnectorSword = new ItemStack("minecraft:diamond_sword", 1);
+  roomConnectorSword.nameTag = "RoomConnectorSword";
 
-const endPositionAxe = new ItemStack("minecraft:diamond_axe", 1);
-endPositionAxe.nameTag = "EndPositionAxe";
+  startPositionPickaxe = new ItemStack("minecraft:diamond_pickaxe", 1);
+  startPositionPickaxe.nameTag = "StartPositionPickaxe";
 
-const saveRoomHoe = new ItemStack("minecraft:diamond_hoe", 1);
-saveRoomHoe.nameTag = "SaveRoomHoe";
+  endPositionAxe = new ItemStack("minecraft:diamond_axe", 1);
+  endPositionAxe.nameTag = "EndPositionAxe";
+
+  saveRoomHoe = new ItemStack("minecraft:diamond_hoe", 1);
+  saveRoomHoe.nameTag = "SaveRoomHoe";
+});
 
 let editingPlayers: Set<Player> = new Set();
 

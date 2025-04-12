@@ -37,7 +37,7 @@ import "./MapParser/loadMap"
 import "Ethan/EthanMain";
 
 //Better Chat
-import "betterChat";
+//import "betterChat";
 
 import { Logger } from "staticScripts/Logger";
 

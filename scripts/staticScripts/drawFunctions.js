@@ -1,4 +1,4 @@
-import { world, } from "@minecraft/server";
+import { system, world, } from "@minecraft/server";
 import { VectorFunctions } from "./vectorFunctions";
 import { quadraticFit } from "./MathFunctions";
 import { AwaitFunctions } from "./awaitFunctions";
@@ -6,7 +6,10 @@ import { CollisionFunctions } from "./collisionFunctions";
 import { Logger } from "./Logger";
 //import { sys } from "typescript";
 //import { sys } from "typescript"
-const overworld = world.getDimension("overworld");
+let overworld;
+system.run(() => {
+    overworld = world.getDimension("overworld");
+});
 export { DrawFunctions };
 class DrawFunctions {
     /**

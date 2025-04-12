@@ -1,33 +1,48 @@
-import { world, } from "@minecraft/server";
+import { world, system, } from "@minecraft/server";
 export { GlobalVars };
 class GlobalVars {
+    static initialize() {
+        system.run(() => {
+            this.players = world.getAllPlayers();
+            this.overworld = world.getDimension("overworld");
+            this.nether = world.getDimension("nether");
+            this.theEnd = world.getDimension("the_end");
+            this.structureManager = world.structureManager;
+        });
+    }
     static getAllEntities(options) {
-        const entities = options
-            ? GlobalVars.overworld
-                .getEntities(options)
-                .concat(GlobalVars.nether.getEntities(options))
-                .concat(GlobalVars.theEnd.getEntities(options))
-            : GlobalVars.overworld
-                .getEntities()
-                .concat(GlobalVars.nether.getEntities())
-                .concat(GlobalVars.theEnd.getEntities());
+        let entities = [];
+        system.run(() => {
+            entities = options
+                ? this.overworld
+                    .getEntities(options)
+                    .concat(this.nether.getEntities(options))
+                    .concat(this.theEnd.getEntities(options))
+                : this.overworld
+                    .getEntities()
+                    .concat(this.nether.getEntities())
+                    .concat(this.theEnd.getEntities());
+        });
         return entities;
     }
-    static getPlayers() {
-        this.players = world.getAllPlayers();
+    static updatePlayers() {
+        system.run(() => {
+            this.players = world.getAllPlayers();
+        });
     }
 }
-GlobalVars.players = world.getAllPlayers();
 /**
- * @type {Dimension}
+ * @type {Player[]}
  */
-GlobalVars.overworld = world.getDimension("overworld");
-GlobalVars.nether = world.getDimension("nether");
-GlobalVars.theEnd = world.getDimension("the_end");
+GlobalVars.players = [];
 GlobalVars.spawn = { x: 15, y: 300, z: 15 };
-world.afterEvents.playerSpawn.subscribe((eventData) => {
-    GlobalVars.getPlayers();
+// Initialize on first tick
+system.run(() => {
+    GlobalVars.initialize();
 });
-world.afterEvents.playerLeave.subscribe((eventData) => {
-    GlobalVars.getPlayers();
+world.afterEvents.playerSpawn.subscribe(() => {
+    GlobalVars.updatePlayers();
+});
+world.afterEvents.playerLeave.subscribe(() => {
+    GlobalVars.updatePlayers();
 });

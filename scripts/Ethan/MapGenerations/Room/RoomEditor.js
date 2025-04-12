@@ -5,14 +5,20 @@ import { addCommand, showHUD } from "staticScripts/commandFunctions";
 import { TickFunctions } from "staticScripts/tickFunctions";
 import { DrawFunctions } from "staticScripts/drawFunctions";
 import { ModalFormData } from "@minecraft/server-ui";
-const roomConnectorSword = new ItemStack("minecraft:diamond_sword", 1);
-roomConnectorSword.nameTag = "RoomConnectorSword";
-const startPositionPickaxe = new ItemStack("minecraft:diamond_pickaxe", 1);
-startPositionPickaxe.nameTag = "StartPositionPickaxe";
-const endPositionAxe = new ItemStack("minecraft:diamond_axe", 1);
-endPositionAxe.nameTag = "EndPositionAxe";
-const saveRoomHoe = new ItemStack("minecraft:diamond_hoe", 1);
-saveRoomHoe.nameTag = "SaveRoomHoe";
+let roomConnectorSword;
+let startPositionPickaxe;
+let endPositionAxe;
+let saveRoomHoe;
+system.run(() => {
+    roomConnectorSword = new ItemStack("minecraft:diamond_sword", 1);
+    roomConnectorSword.nameTag = "RoomConnectorSword";
+    startPositionPickaxe = new ItemStack("minecraft:diamond_pickaxe", 1);
+    startPositionPickaxe.nameTag = "StartPositionPickaxe";
+    endPositionAxe = new ItemStack("minecraft:diamond_axe", 1);
+    endPositionAxe.nameTag = "EndPositionAxe";
+    saveRoomHoe = new ItemStack("minecraft:diamond_hoe", 1);
+    saveRoomHoe.nameTag = "SaveRoomHoe";
+});
 let editingPlayers = new Set();
 let currentRoom = null;
 function getFacingDirection(player) {
